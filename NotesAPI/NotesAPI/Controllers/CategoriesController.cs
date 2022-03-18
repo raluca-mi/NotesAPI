@@ -21,7 +21,7 @@ namespace NotesAPI.Controllers
         /// <summary>
         /// Get all categories
         /// </summary>
-        /// <returns>Returns list of notes</returns>
+        /// <returns>list of notes</returns>
         [HttpGet]
         public IActionResult GetCategories()
         {
@@ -31,8 +31,8 @@ namespace NotesAPI.Controllers
         /// <summary>
         /// Gets one category
         /// </summary>
-        /// <param name="id">Has one string parameter -the id of the category</param>
-        /// <returns>Returns one category</returns>
+        /// <param name="id">(string) id of the category</param>
+        /// <returns>one category</returns>
         /// 
         [HttpGet("{id}")]
         public IActionResult GetOneCategory(string id)
@@ -50,8 +50,8 @@ namespace NotesAPI.Controllers
         /// <summary>
         /// Add a new category
         /// </summary>
-        /// <param name="categ">Has one parameter of type Category</param>
-        /// <returns>Returns all categories</returns>
+        /// <param name="categ"(Category) categ</param>
+        /// <returns>list of updated categories</returns>
         [HttpPost]
         public IActionResult Post([FromBody] Category categ)
         {
@@ -63,8 +63,8 @@ namespace NotesAPI.Controllers
         /// <summary>
         /// Delete one category
         /// </summary>
-        /// <param name="id">Has one string parameter -the id of the category</param>
-        /// <returns>Returns the list of categories and status code 200 if the id is valid, otherwise BadRequest </returns>
+        /// <param name="id">(string) id of the category</param>
+        /// <returns>updated list of categories and status code 200 if the id is valid, otherwise BadRequest </returns>
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {

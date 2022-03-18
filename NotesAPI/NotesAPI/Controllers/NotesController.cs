@@ -20,12 +20,21 @@ namespace NotesAPI.Controllers
         new Note { Id = Guid.NewGuid(), CategoryId = "1", OwnerId = Guid.NewGuid(), Title = "Fifth Note", Description = "Fifth Note Description" }
         };
 
+        /// <summary>
+        /// Get all notes
+        /// </summary>
+        /// <returns>Returns list of notes</returns>
         [HttpGet]
         public IActionResult GetNotes()
         {
             return Ok(_notes);
         }
 
+        /// <summary>
+        /// Create new note
+        /// </summary>
+        /// <param name="note">Gets from body a note of type Note </param>
+        /// <returns></returns>
         [HttpPost]
         public IActionResult CreateNote([FromBody] Note note)
         {
@@ -33,10 +42,6 @@ namespace NotesAPI.Controllers
             return Ok(_notes);
         }
 
-        /// <summary>
-        /// Get all notes
-        /// </summary>
-        /// <returns></returns>
 
         //From other course
 
@@ -45,19 +50,7 @@ namespace NotesAPI.Controllers
          {
              return Ok(UserAgent);
          }
-
-         [HttpGet("{id}")]
-         public IActionResult GetOne(string id)
-         {
-             return Ok(id);
-         }
-
-         [HttpPost]
-         public IActionResult Post([FromBody] Note note)
-         {
-             return Ok(note);
-         }
-     */
+        */
 
     }
 }

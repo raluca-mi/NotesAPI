@@ -17,7 +17,7 @@ namespace NotesAPI.Controllers
         };
 
         private readonly ILogger<WeatherForecastController> _logger;
-        /// <param name="logger"></param>
+        /// <param name="logger">The parameter logger has ILogger of WeatherForecastController Type </param>
         public WeatherForecastController(ILogger<WeatherForecastController> logger)
         {
             _logger = logger;
@@ -27,7 +27,7 @@ namespace NotesAPI.Controllers
         /// Get weather forcast
         /// </summary>
         /// <returns>
-        /// description
+        /// returns first 5 WeatherForecast elements
         /// </returns>
         
         [ProducesResponseType(statusCode:400)]

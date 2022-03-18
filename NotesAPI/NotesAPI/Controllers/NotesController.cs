@@ -24,6 +24,7 @@ namespace NotesAPI.Controllers
         /// Get all notes
         /// </summary>
         /// <returns>list of notes</returns>
+        
         [HttpGet]
         public IActionResult GetNotes()
         {
@@ -35,12 +36,13 @@ namespace NotesAPI.Controllers
         /// </summary>
         /// <param name="note">(Note) note</param>
         /// <returns>updated list of notes</returns>
+        
         [HttpPost]
         public IActionResult CreateNote([FromBody] Note note)
         {
             _notes.Add(note);
-            return Ok(_notes);
-            //return CreatedAtRoute("GetNoteById", new { id = note.Id.ToString() }, note);
+            //return Ok(_notes);
+            return CreatedAtRoute("GetNoteById", new { id = note.Id }, note);
         }
 
         /// <summary>
@@ -48,12 +50,10 @@ namespace NotesAPI.Controllers
         /// </summary>
         /// <param name="ownerId">(Guid) id of the owner</param>
         /// <returns>one note</returns>
-        /// 
-        [HttpGet("{ownerId}")]
+         
+        [HttpGet("owner/{ownerId}")]
         public IActionResult GetNoteByOwner(Guid ownerId)
         {
-            /*Note filteredNote=(Note)_notes.Where(note => note.OwnerId == ownerId);
-            return Ok(filteredNote);*/
             foreach (var note in _notes)
             {
                 if (note.OwnerId == ownerId)
@@ -65,14 +65,15 @@ namespace NotesAPI.Controllers
         /// <summary>
         /// Gets note with given id
         /// </summary>
-        /// <param name="id">(string) id of the note</param>
+        /// <param name="id">(Guid) id of the note</param>
         /// <returns>searched note, or BadRequest status</returns>
-        [HttpGet("{id}")]
-        public IActionResult GetNoteById(string id)
+        
+        [HttpGet("{id}", Name = "GetNoteById")]
+        public IActionResult GetNoteById(Guid id)
         {
             foreach (var note in _notes)
             {
-                if (note.Id.ToString() == id)
+                if (note.Id == id)
                     return Ok(note);
             }
             return StatusCode(StatusCodes.Status400BadRequest, "Note does not exist");
@@ -85,6 +86,7 @@ namespace NotesAPI.Controllers
         /// </summary>
         /// <param name="id">(string) id of the note</param>
         /// <returns>list of notes and status code 200 if the id is valid, otherwise BadRequest </returns>
+        
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
@@ -96,7 +98,7 @@ namespace NotesAPI.Controllers
                     return Ok(_notes);
                 }
             }
-            return StatusCode(StatusCodes.Status400BadRequest, "Category does not exist");
+            return StatusCode(StatusCodes.Status400BadRequest, "Note does not exist");
         }
 
         //From other course

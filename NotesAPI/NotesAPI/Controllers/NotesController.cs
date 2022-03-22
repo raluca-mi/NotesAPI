@@ -12,19 +12,19 @@ namespace NotesAPI.Controllers
     [ApiController]
     public class NotesController : ControllerBase
     {
-        static List<Note> _notes = new List<Note> { 
-        new Note { Id = Guid.NewGuid(), CategoryId = "1", OwnerId = Guid.NewGuid(), Title = "First Note", Description = "First Note Description" },
-        new Note { Id = Guid.NewGuid(), CategoryId = "1", OwnerId = Guid.NewGuid(), Title = "Second Note", Description = "Second Note Description" },
-        new Note { Id = Guid.NewGuid(), CategoryId = "1", OwnerId = Guid.NewGuid(), Title = "Third Note", Description = "Third Note Description" },
-        new Note { Id = Guid.NewGuid(), CategoryId = "1", OwnerId = Guid.NewGuid(), Title = "Fourth Note", Description = "Fourth Note Description" },
-        new Note { Id = Guid.NewGuid(), CategoryId = "1", OwnerId = Guid.NewGuid(), Title = "Fifth Note", Description = "Fifth Note Description" }
+        private static List<Note> _notes = new List<Note> { new Note { Id = new Guid("00000000-0000-0000-0000-000000000001"), CategoryId = "1", OwnerId = new Guid("00000000-0000-0000-0000-000000000001"), Title = "First Note", Description = "First Note Description" },
+        new Note { Id = new Guid("00000000-0000-0000-0000-000000000002"), CategoryId = "1", OwnerId = new Guid("00000000-0000-0000-0000-000000000001"), Title = "Second Note", Description = "Second Note Description" },
+        new Note { Id = new Guid("00000000-0000-0000-0000-000000000003"), CategoryId = "1", OwnerId = new Guid("00000000-0000-0000-0000-000000000001"), Title = "Third Note", Description = "Third Note Description" },
+        new Note { Id = new Guid("00000000-0000-0000-0000-000000000004"), CategoryId = "1", OwnerId = new Guid("00000000-0000-0000-0000-000000000001"), Title = "Fourth Note", Description = "Fourth Note Description" },
+        new Note { Id = new Guid("00000000-0000-0000-0000-000000000005"), CategoryId = "1", OwnerId = new Guid("00000000-0000-0000-0000-000000000001"), Title = "Fifth Note", Description = "Fifth Note Description" }
         };
+
 
         /// <summary>
         /// Get all notes
         /// </summary>
         /// <returns>list of notes</returns>
-        
+
         [HttpGet]
         public IActionResult GetNotes()
         {
@@ -40,9 +40,12 @@ namespace NotesAPI.Controllers
         [HttpPost]
         public IActionResult CreateNote([FromBody] Note note)
         {
+            if(note==null)
+                return BadRequest("Note is null");
+            
             _notes.Add(note);
-            //return Ok(_notes);
-            return CreatedAtRoute("GetNoteById", new { id = note.Id }, note);
+            return Ok(_notes);
+            //return CreatedAtRoute("GetNoteById", new { id = note.Id }, note);
         }
 
         /// <summary>
@@ -88,18 +91,39 @@ namespace NotesAPI.Controllers
         /// <returns>list of notes and status code 200 if the id is valid, otherwise BadRequest </returns>
         
         [HttpDelete("{id}")]
-        public IActionResult Delete(string id)
+        public IActionResult DeleteNote(Guid id)
         {
-            foreach (var note in _notes)
-            {
-                if (note.Id.ToString() == id)
-                {
-                    _notes.Remove(note);
-                    return Ok(_notes);
-                }
-            }
-            return StatusCode(StatusCodes.Status400BadRequest, "Note does not exist");
+            int index = _notes.FindIndex(note => note.Id == id) ;
+            if (index == -1)
+                return NotFound("The note was not found!");
+
+            _notes.RemoveAt(index);
+            return Ok("The note was deleted");
         }
+
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateNote(Guid id, [FromBody] Note note)
+        {
+            if (note == null)
+            {
+                return BadRequest("Note can't be null");
+            }
+
+            int index = _notes.FindIndex(note => note.Id == id);
+
+            if (index == -1)
+            {
+                return CreateNote(note);                //if index not found create a new note
+                //return NotFound("Id not found!");     //if index not found respond with NotFound
+            }
+
+            note.Id = id;
+            _notes[index] = note;
+
+            return Ok(_notes);
+        }
+
 
         //From other course
 

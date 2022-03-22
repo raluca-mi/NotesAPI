@@ -48,10 +48,11 @@ namespace NotesAPI.Controllers
 
 
         /// <summary>
-        /// Add a new category
+        /// Create a new category
         /// </summary>
-        /// <param name="categ"(Category) categ</param>
+        /// <param name="categ"(Category) category</param>
         /// <returns>list of updated categories</returns>
+        
         [HttpPost]
         public IActionResult Post([FromBody] Category categ)
         {

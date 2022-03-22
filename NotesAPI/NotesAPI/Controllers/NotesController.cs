@@ -52,7 +52,7 @@ namespace NotesAPI.Controllers
         /// Gets one note by owner id
         /// </summary>
         /// <param name="ownerId">(Guid) id of the owner</param>
-        /// <returns>one note</returns>
+        /// <returns>found note</returns>
          
         [HttpGet("owner/{ownerId}")]
         public IActionResult GetNoteByOwner(Guid ownerId)
@@ -62,7 +62,7 @@ namespace NotesAPI.Controllers
                 if (note.OwnerId == ownerId)
                     return Ok(note);
             }
-            return StatusCode(StatusCodes.Status400BadRequest, "Note does not exist");
+            return NotFound("Note does not exist");
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace NotesAPI.Controllers
                 if (note.Id == id)
                     return Ok(note);
             }
-            return StatusCode(StatusCodes.Status400BadRequest, "Note does not exist");
+            return NotFound("Note does not exist");
 
         }
 
@@ -87,8 +87,8 @@ namespace NotesAPI.Controllers
         /// <summary>
         /// Delete one note
         /// </summary>
-        /// <param name="id">(string) id of the note</param>
-        /// <returns>list of notes and status code 200 if the id is valid, otherwise BadRequest </returns>
+        /// <param name="id">(Guid) id of the note</param>
+        /// <returns>Ok if the id is valid, otherwise NotFound </returns>
         
         [HttpDelete("{id}")]
         public IActionResult DeleteNote(Guid id)
@@ -101,6 +101,12 @@ namespace NotesAPI.Controllers
             return Ok("The note was deleted");
         }
 
+        /// <summary>
+        /// Update one note
+        /// </summary>
+        /// <param name="id">(Guid) id of the note</param>
+        /// <param name="note">(Note) updated note</param>
+        /// <returns>List of updated notes if the id is valid, otherwise create new note</returns>
 
         [HttpPut("{id}")]
         public IActionResult UpdateNote(Guid id, [FromBody] Note note)

@@ -102,7 +102,25 @@ namespace NotesAPI.Controllers
         }
 
         /// <summary>
-        /// Update one note
+        /// Delete one note
+        /// </summary>
+        /// <param name="id">(Guid) id of the note</param>
+        /// <param name="ownerId">(Guid) id of the owner</param>
+        /// <returns>Ok if the id is valid, otherwise NotFound </returns>
+
+        [HttpDelete("{id},{ownerId}")]
+        public IActionResult DeleteNoteByIdAndOwner(Guid id,Guid ownerId)
+        {
+            int index = _notes.FindIndex(note => note.Id == id && note.OwnerId == ownerId);
+            if (index == -1)
+                return NotFound("The note was not found!");
+
+            _notes.RemoveAt(index);
+            return Ok("The note was deleted");
+        }
+
+        /// <summary>
+        /// Update one note by id and owner id
         /// </summary>
         /// <param name="id">(Guid) id of the note</param>
         /// <param name="note">(Note) updated note</param>
@@ -130,6 +148,37 @@ namespace NotesAPI.Controllers
             return Ok(_notes);
         }
 
+
+        /// <summary>
+        /// Update one note
+        /// </summary>
+        /// <param name="id">(Guid) id of the note</param>
+        /// <param name="ownerId">(Guid) id of the owner</param>
+        /// <param name="note">(Note) updated note</param>
+        /// <returns>List of updated notes if the id is valid, otherwise create new note</returns>
+
+        [HttpPut("{id},{ownerId}")]
+        public IActionResult UpdateNoteByIdAndOwner(Guid id, Guid ownerId, [FromBody] Note note)
+        {
+            if (note == null)
+            {
+                return BadRequest("Note can't be null");
+            }
+
+            int index = _notes.FindIndex(note => note.Id == id && note.OwnerId == ownerId);
+
+            if (index == -1)
+            {
+                return CreateNote(note);                //if index not found create a new note
+                //return NotFound("Id not found!");     //if index not found respond with NotFound
+            }
+
+            note.Id = id;
+            note.OwnerId = ownerId;
+            _notes[index] = note;
+
+            return Ok(_notes);
+        }
 
         //From other course
 

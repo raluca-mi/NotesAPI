@@ -37,6 +37,7 @@ namespace NotesAPI
             });
             services.AddControllers();
             services.AddTransient<INoteCollectionService, NoteCollectionService>();
+            services.AddTransient<IOwnerCollectionService, OwnerCollectionService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

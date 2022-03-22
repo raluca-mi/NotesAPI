@@ -32,45 +32,11 @@ namespace NotesAPI.Controllers
         }
 
         /// <summary>
-        /// Create new note
-        /// </summary>
-        /// <param name="note">(Note) note</param>
-        /// <returns>updated list of notes</returns>
-        
-        [HttpPost]
-        public IActionResult CreateNote([FromBody] Note note)
-        {
-            if(note==null)
-                return BadRequest("Note is null");
-            
-            _notes.Add(note);
-            return Ok(_notes);
-            //return CreatedAtRoute("GetNoteById", new { id = note.Id }, note);
-        }
-
-        /// <summary>
-        /// Gets one note by owner id
-        /// </summary>
-        /// <param name="ownerId">(Guid) id of the owner</param>
-        /// <returns>found note</returns>
-         
-        [HttpGet("owner/{ownerId}")]
-        public IActionResult GetNoteByOwner(Guid ownerId)
-        {
-            foreach (var note in _notes)
-            {
-                if (note.OwnerId == ownerId)
-                    return Ok(note);
-            }
-            return NotFound("Note does not exist");
-        }
-
-        /// <summary>
         /// Gets note with given id
         /// </summary>
         /// <param name="id">(Guid) id of the note</param>
         /// <returns>searched note, or BadRequest status</returns>
-        
+
         [HttpGet("{id}", Name = "GetNoteById")]
         public IActionResult GetNoteById(Guid id)
         {
@@ -83,44 +49,42 @@ namespace NotesAPI.Controllers
 
         }
 
-
         /// <summary>
-        /// Delete one note
+        /// Gets one note by owner id
         /// </summary>
-        /// <param name="id">(Guid) id of the note</param>
-        /// <returns>Ok if the id is valid, otherwise NotFound </returns>
-        
-        [HttpDelete("{id}")]
-        public IActionResult DeleteNote(Guid id)
-        {
-            int index = _notes.FindIndex(note => note.Id == id) ;
-            if (index == -1)
-                return NotFound("The note was not found!");
-
-            _notes.RemoveAt(index);
-            return Ok("The note was deleted");
-        }
-
-        /// <summary>
-        /// Delete one note
-        /// </summary>
-        /// <param name="id">(Guid) id of the note</param>
         /// <param name="ownerId">(Guid) id of the owner</param>
-        /// <returns>Ok if the id is valid, otherwise NotFound </returns>
+        /// <returns>first found note</returns>
 
-        [HttpDelete("{id},{ownerId}")]
-        public IActionResult DeleteNoteByIdAndOwner(Guid id,Guid ownerId)
+        [HttpGet("owner/{ownerId}")]
+        public IActionResult GetNoteByOwner(Guid ownerId)
         {
-            int index = _notes.FindIndex(note => note.Id == id && note.OwnerId == ownerId);
-            if (index == -1)
-                return NotFound("The note was not found!");
-
-            _notes.RemoveAt(index);
-            return Ok("The note was deleted");
+            foreach (var note in _notes)
+            {
+                if (note.OwnerId == ownerId)
+                    return Ok(note);
+            }
+            return NotFound("Note does not exist");
         }
 
         /// <summary>
-        /// Update one note by id and owner id
+        /// Create new note
+        /// </summary>
+        /// <param name="note">(Note) note</param>
+        /// <returns>updated list of notes</returns>
+
+        [HttpPost]
+        public IActionResult CreateNote([FromBody] Note note)
+        {
+            if(note==null)
+                return BadRequest("Note is null");
+            
+            _notes.Add(note);
+            return Ok(_notes);
+            //return CreatedAtRoute("GetNoteById", new { id = note.Id }, note);
+        }
+
+        /// <summary>
+        /// Update one note by id
         /// </summary>
         /// <param name="id">(Guid) id of the note</param>
         /// <param name="note">(Note) updated note</param>
@@ -179,6 +143,64 @@ namespace NotesAPI.Controllers
 
             return Ok(_notes);
         }
+
+
+        /// <summary>
+        /// Delete one note
+        /// </summary>
+        /// <param name="id">(Guid) id of the note</param>
+        /// <returns>Ok if the id is valid, otherwise NotFound </returns>
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteNote(Guid id)
+        {
+            int index = _notes.FindIndex(note => note.Id == id) ;
+            if (index == -1)
+                return NotFound("The note was not found!");
+
+            _notes.RemoveAt(index);
+            return Ok("The note was deleted");
+        }
+
+        /// <summary>
+        /// Delete one note
+        /// </summary>
+        /// <param name="id">(Guid) id of the note</param>
+        /// <param name="ownerId">(Guid) id of the owner</param>
+        /// <returns>Ok if the id is valid, otherwise NotFound </returns>
+
+        [HttpDelete("{id},{ownerId}")]
+        public IActionResult DeleteNoteByIdAndOwner(Guid id,Guid ownerId)
+        {
+            int index = _notes.FindIndex(note => note.Id == id && note.OwnerId == ownerId);
+            if (index == -1)
+                return NotFound("The note was not found!");
+
+            _notes.RemoveAt(index);
+            return Ok("The note was deleted");
+        }
+
+        /// <summary>
+        /// Delete all notes of a given owner
+        /// </summary>
+        /// <param name="ownerId">(Guid) id of the owner</param>
+        /// <returns>Ok if at least one note found by ownerId, otherwise NotFound</returns>
+
+        [HttpDelete("owner/{ownerId}")]
+        public IActionResult DeleteNotesByOwner(Guid ownerId)
+        {
+
+            int index = _notes.FindIndex(note => note.OwnerId == ownerId);
+            if (index == -1)
+                return NotFound("The note was not found!");
+            while (_notes.FindIndex(note => note.OwnerId == ownerId) != -1)
+            {
+                _notes.RemoveAt(index);
+            }
+
+            return Ok("The notes have been deleted");
+        }
+
 
         //From other course
 

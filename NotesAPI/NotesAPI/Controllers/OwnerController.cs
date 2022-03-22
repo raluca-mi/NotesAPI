@@ -43,24 +43,6 @@ namespace NotesAPI.Controllers
         }
 
 
-
-        /// <summary>
-        /// Delete one owner by id
-        /// </summary>
-        /// <param name="id">(Guid) id of the owner</param>
-        /// <returns>Ok if the id is valid, otherwise NotFound </returns>
-
-        [HttpDelete("{id}")]
-        public IActionResult DeleteOwner(Guid id)
-        {
-            int index = _owners.FindIndex(owner => owner.Id == id);
-            if (index == -1)
-                return NotFound("The note was not found!");
-
-            _owners.RemoveAt(index);
-            return Ok("The owner was deleted");
-        }
-
         /// <summary>
         /// Update one owner by id
         /// </summary>
@@ -88,6 +70,24 @@ namespace NotesAPI.Controllers
             _owners[index] = owner;
 
             return Ok(_owners);
+        }
+
+
+        /// <summary>
+        /// Delete one owner by id
+        /// </summary>
+        /// <param name="id">(Guid) id of the owner</param>
+        /// <returns>Ok if the id is valid, otherwise NotFound </returns>
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteOwner(Guid id)
+        {
+            int index = _owners.FindIndex(owner => owner.Id == id);
+            if (index == -1)
+                return NotFound("The note was not found!");
+
+            _owners.RemoveAt(index);
+            return Ok("The owner was deleted");
         }
 
     }

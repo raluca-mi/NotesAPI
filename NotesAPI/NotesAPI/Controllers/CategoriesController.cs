@@ -29,7 +29,7 @@ namespace NotesAPI.Controllers
         }
 
         /// <summary>
-        /// Gets one category
+        /// Gets one category by id
         /// </summary>
         /// <param name="id">(string) id of the category</param>
         /// <returns>one category</returns>
@@ -42,7 +42,7 @@ namespace NotesAPI.Controllers
                 if (categ.Id == id)
                     return Ok(categ);
             }
-            return StatusCode(StatusCodes.Status400BadRequest, "Category does not exist");
+            return NotFound("Category does not exist");
 
         }
 
@@ -54,8 +54,10 @@ namespace NotesAPI.Controllers
         /// <returns>list of updated categories</returns>
         
         [HttpPost]
-        public IActionResult Post([FromBody] Category categ)
-        {
+        public IActionResult CreateCategory([FromBody] Category categ)
+        {   
+            if (categ == null)
+                return BadRequest("Category can't be null");
             _categories.Add(categ);
             return Ok(_categories);
         }
@@ -67,7 +69,7 @@ namespace NotesAPI.Controllers
         /// <param name="id">(string) id of the category</param>
         /// <returns>updated list of categories and status code 200 if the id is valid, otherwise BadRequest </returns>
         [HttpDelete("{id}")]
-        public IActionResult Delete(string id)
+        public IActionResult DeleteCategory(string id)
         {
             foreach(var categ in _categories)
             {
@@ -77,7 +79,7 @@ namespace NotesAPI.Controllers
                     return Ok(_categories);
                 }
             }
-            return StatusCode(StatusCodes.Status400BadRequest, "Category does not exist");
+            return NotFound("Category does not exist");
         }
     }
 }

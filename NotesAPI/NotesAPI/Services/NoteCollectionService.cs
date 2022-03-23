@@ -1,4 +1,6 @@
-﻿using NotesAPI.Models;
+﻿using MongoDB.Driver;
+using NotesAPI.Models;
+using NotesAPI.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,70 +11,59 @@ namespace NotesAPI.Services
     public class NoteCollectionService : INoteCollectionService
     {
 
-        private static List<Note> _notes = new List<Note> { new Note { Id = new Guid("00000000-0000-0000-0000-000000000001"), CategoryId = "1", OwnerId = new Guid("00000000-0000-0000-0000-000000000001"), Title = "First Note", Description = "First Note Description" },
-        new Note { Id = new Guid("00000000-0000-0000-0000-000000000002"), CategoryId = "1", OwnerId = new Guid("00000000-0000-0000-0000-000000000001"), Title = "Second Note", Description = "Second Note Description" },
-        new Note { Id = new Guid("00000000-0000-0000-0000-000000000003"), CategoryId = "1", OwnerId = new Guid("00000000-0000-0000-0000-000000000001"), Title = "Third Note", Description = "Third Note Description" },
-        new Note { Id = new Guid("00000000-0000-0000-0000-000000000004"), CategoryId = "1", OwnerId = new Guid("00000000-0000-0000-0000-000000000001"), Title = "Fourth Note", Description = "Fourth Note Description" },
-        new Note { Id = new Guid("00000000-0000-0000-0000-000000000005"), CategoryId = "1", OwnerId = new Guid("00000000-0000-0000-0000-000000000001"), Title = "Fifth Note", Description = "Fifth Note Description" }
-        };
-
-        public NoteCollectionService() {}
-
-        public bool Create(Note note)
+        private readonly IMongoCollection<Note> _notes;
+        public NoteCollectionService(IMongoDBSettings settings)
         {
-            _notes.Add(note);
+            var client = new MongoClient(settings.ConnectionString);
+            var database = client.GetDatabase(settings.DatabaseName);
+
+            _notes = database.GetCollection<Note>(settings.NoteCollectionName);
+        }
+
+
+        public async Task<bool> Create(Note note)
+        {
+            await _notes.InsertOneAsync(note);
             return true;
         }
 
-        public bool Delete(Guid id)
+        public async Task<bool> Delete(Guid id)
         {
-            int index = _notes.FindIndex(note => note.Id == id);
-            if (index == -1)
+            var result = await _notes.DeleteOneAsync(note => note.Id == id);
+            if (result.IsAcknowledged && result.DeletedCount == 0)
+            {
                 return false;
-            
-            _notes.RemoveAt(index);
+            }
             return true;
         }
 
-        public Note Get(Guid id)
+        public async Task<Note> Get(Guid id)
         {
-            int index = _notes.FindIndex(note=>note.Id == id);
-            if (index == -1)
-                return null;
-            return _notes[index];
+            return (await _notes.FindAsync(note => note.Id == id)).FirstOrDefault();
         }
 
-        public List<Note> GetAll()
+        public async Task<List<Note>> GetAll()
         {
-            return _notes;
+            var result = await _notes.FindAsync(note => true);
+            return result.ToList();
         }
 
-        public List<Note> GetNotesByOwnerId(Guid ownerId)
+        public async Task<List<Note>> GetNotesByOwnerId(Guid ownerId)
         {
-            List<Note> filteredNotes= new List<Note>();
-            foreach (var note in _notes)
-            {
-                if (note.OwnerId == ownerId)
-                    filteredNotes.Add(note);
-            }
-            return filteredNotes;
+            return (await _notes.FindAsync(note => note.OwnerId == ownerId)).ToList();
         }
 
-        public bool Update(Guid id, Note note)
+        public async Task<bool> Update(Guid id, Note note)
         {
-            int index = _notes.FindIndex(note => note.Id == id);
-
-            if (index == -1)
-            {
-                Create(note); 
-                return false;               //if index not found create a new note
-           
-            }
-
             note.Id = id;
-            _notes[index] = note;
-
+            var result = await _notes.ReplaceOneAsync(n => n.Id == id, note);
+            if (!result.IsAcknowledged && result.ModifiedCount == 0)
+            {
+                await _notes.InsertOneAsync(note);
+                return false;
+            }
             return true;
         }
+
     }
 }

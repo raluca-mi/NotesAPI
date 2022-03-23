@@ -50,7 +50,7 @@ namespace NotesAPI.Controllers
         /// <summary>
         /// Create a new category
         /// </summary>
-        /// <param name="categ"(Category) category</param>
+        /// <param name="categ">(Category) category</param>
         /// <returns>list of updated categories</returns>
         
         [HttpPost]

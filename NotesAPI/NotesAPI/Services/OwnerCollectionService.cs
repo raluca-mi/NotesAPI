@@ -20,13 +20,21 @@ namespace NotesAPI.Services
             _owners = database.GetCollection<Owner>(settings.OwnerCollectionName);
         }
 
-        public async Task<bool> Create(Owner owner)
+        public async Task<Owner> GetAsync(Guid id)
+        {
+            return (await _owners.FindAsync(owner => owner.Id == id)).FirstOrDefault();
+        }
+        public async Task<List<Owner>> GetAllAsync()
+        {
+            var result = await _owners.FindAsync(owner => true);
+            return result.ToList();
+        }
+        public async Task<bool> CreateAsync(Owner owner)
         {
             await _owners.InsertOneAsync(owner);
             return true;
         }
-
-        public async Task<bool> Delete(Guid id)
+        public async Task<bool> DeleteAsync(Guid id)
         {
             var result = await _owners.DeleteOneAsync(owner => owner.Id == id);
             if (result.IsAcknowledged && result.DeletedCount == 0)
@@ -35,19 +43,7 @@ namespace NotesAPI.Services
             }
             return true;
         }
-
-        public async Task<Owner> Get(Guid id)
-        {
-            return (await _owners.FindAsync(owner => owner.Id == id)).FirstOrDefault();
-        }
-
-        public async Task<List<Owner>> GetAll()
-        {
-            var result = await _owners.FindAsync(owner => true);
-            return result.ToList();
-        }
-
-        public async Task<bool> Update(Guid id, Owner owner)
+        public async Task<bool> UpdateAsync(Guid id, Owner owner)
         {
             owner.Id = id;
             var result = await _owners.ReplaceOneAsync(o => o.Id == id, owner);

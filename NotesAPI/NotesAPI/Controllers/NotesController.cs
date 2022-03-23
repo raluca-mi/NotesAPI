@@ -19,15 +19,17 @@ namespace NotesAPI.Controllers
             _noteCollectionService = noteCollectionService ?? throw new ArgumentNullException(nameof(noteCollectionService));
         }
 
+        #region Get
+
         /// <summary>
         /// Get all notes
         /// </summary>
         /// <returns>list of notes</returns>
 
         [HttpGet]
-        public async Task<IActionResult> GetNotes()
+        public async Task<IActionResult> GetNotesAsync()
         {
-            return Ok(await _noteCollectionService.GetAll());
+            return Ok(await _noteCollectionService.GetAllAsync());
         }
 
         /// <summary>
@@ -37,32 +39,35 @@ namespace NotesAPI.Controllers
         /// <returns>searched note, or BadRequest status</returns>
 
         [HttpGet("{id}", Name = "GetNoteById")]
-        public async Task<IActionResult> GetNoteById(Guid id)
+        public async Task<IActionResult> GetNoteByIdAsync(Guid id)
         {
-            var note =await _noteCollectionService.Get(id);
+            var note =await _noteCollectionService.GetAsync(id);
 
             if (note == null)
-                return NotFound();
+                return NotFound("Note not foud");
             return Ok(note);
         }
 
         /// <summary>
-        /// Gets one note by owner id
+        /// Gets notes by owner id
         /// </summary>
         /// <param name="ownerId">(Guid) id of the owner</param>
-        /// <returns>first found note</returns>
+        /// <returns>found notes</returns>
 
         [HttpGet("owner/{ownerId}")]
-        public async Task<IActionResult> GetNoteByOwner(Guid ownerId)
+        public async Task<IActionResult> GetNotesByOwnerAsync(Guid ownerId)
         {
-            List<Note> filteredNotes = await _noteCollectionService.GetNotesByOwnerId(ownerId);
+            List<Note> filteredNotes = await _noteCollectionService.GetNotesByOwnerIdAsync(ownerId);
             if (filteredNotes.Count == 0)
             {
-                return NotFound("Note with given owner id doesn't exist!");
+                return NotFound("Notes not found!");
             }
             return Ok(filteredNotes);
 
         }
+        #endregion
+
+        #region Create
 
         /// <summary>
         /// Create new note
@@ -71,14 +76,17 @@ namespace NotesAPI.Controllers
         /// <returns>updated list of notes</returns>
 
         [HttpPost]
-        public async Task<IActionResult> CreateNote([FromBody] Note note)
+        public async Task<IActionResult> CreateNoteAsync([FromBody] Note note)
         {
             if (note == null)
-                return BadRequest("Note is null");
-            await _noteCollectionService.Create(note);
-            return Ok("Note was created");
+                return BadRequest("Note is null!");
+            await _noteCollectionService.CreateAsync(note);
+            return Ok("Note was created!");
           
         }
+        #endregion
+
+        #region Update
 
         /// <summary>
         /// Update one note by id
@@ -88,19 +96,44 @@ namespace NotesAPI.Controllers
         /// <returns>List of updated notes if the id is valid, otherwise create new note</returns>
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateNote(Guid id, [FromBody] Note note)
+        public async Task<IActionResult> UpdateNoteAsync(Guid id, [FromBody] Note note)
         {
             if (note == null)
             {
-                return BadRequest("Note can't be null");
+                return BadRequest("Note is null!");
             }
 
-            if (await _noteCollectionService.Update(id, note) == true)
+            if (await _noteCollectionService.UpdateAsync(id, note) == true)
                 return Ok();
-            else
-            return NotFound();
+
+            return NotFound("Note not found!");
 
         }
+
+        /// <summary>
+        /// Update one note
+        /// </summary>
+        /// <param name = "id" > (Guid)id of the note</param>
+        /// <param name = "ownerId" > (Guid)id of the owner</param>
+        /// <param name = "note" > (Note)updated note</param>
+        /// <returns>List of updated notes if the id is valid, otherwise create new note</returns>
+
+        [HttpPut("{id},{ownerId}")]
+        public async Task<IActionResult> UpdateNoteByIdAndOwnerAsync(Guid id, Guid ownerId, [FromBody] Note note)
+        {
+            if (note == null)
+            {
+                return BadRequest("Note is null!");
+            }
+
+            if (await _noteCollectionService.UpdateNoteByIdAndOwnerAsync(id, ownerId, note) == false)
+                return NotFound("Id not found!");     //if index not found respond with NotFound
+
+            return Ok("Note updated!");
+        }
+        #endregion
+
+        #region Delete
 
         /// <summary>
         /// Delete one note
@@ -109,88 +142,51 @@ namespace NotesAPI.Controllers
         /// <returns>Ok if the id is valid, otherwise NotFound </returns>
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteNote(Guid id)
+        public async Task<IActionResult> DeleteNoteAsync(Guid id)
         {
 
-            if (await _noteCollectionService.Delete(id) == false)
-                return NotFound("The note was not found!");
+            if (await _noteCollectionService.DeleteAsync(id) == false)
+                return NotFound("Note not found!");
             else
-                return Ok("The note has been deleted!");
+                return Ok("Note deleted!");
+        }
+
+        /// <summary>
+        /// Delete all notes of a given owner
+        /// </summary>
+        /// <param name="ownerId">(Guid) id of the owner</param>
+        /// <returns>Ok if at least one note found by ownerId, otherwise NotFound</returns>
+
+        [HttpDelete("owner/{ownerId}")]
+        public async Task<IActionResult> DeleteNotesByOwnerAsync(Guid ownerId)
+        {
+
+            if (await _noteCollectionService.DeleteNotesByOwnerAsync(ownerId) == false)
+                return NotFound("Note not found!");
+
+            return Ok("Notes deleted!");
         }
 
 
-        ///// <summary>
-        ///// Update one note
-        ///// </summary>
-        ///// <param name="id">(Guid) id of the note</param>
-        ///// <param name="ownerId">(Guid) id of the owner</param>
-        ///// <param name="note">(Note) updated note</param>
-        ///// <returns>List of updated notes if the id is valid, otherwise create new note</returns>
+        /// <summary>
+        /// Delete one note
+        /// </summary>
+        /// <param name="id">(Guid) id of the note</param>
+        /// <param name="ownerId">(Guid) id of the owner</param>
+        /// <returns>Ok if the id is valid, otherwise NotFound </returns>
 
-        //[HttpPut("{id},{ownerId}")]
-        //public IActionResult UpdateNoteByIdAndOwner(Guid id, Guid ownerId, [FromBody] Note note)
-        //{
-        //    if (note == null)
-        //    {
-        //        return BadRequest("Note can't be null");
-        //    }
+        [HttpDelete("{id},{ownerId}")]
+        public async Task<IActionResult> DeleteNoteByIdAndOwnerAsync(Guid id, Guid ownerId)
+        {
+           if(await _noteCollectionService.DeleteNoteByIdAndOwnerAsync(id,ownerId)==false)
+                return NotFound("Note not found!");
 
-        //    int index = _notes.FindIndex(note => note.Id == id && note.OwnerId == ownerId);
+            return Ok("Note deleted!");
+        }
 
-        //    if (index == -1)
-        //    {
-        //        return CreateNote(note);                //if index not found create a new note
-        //        //return NotFound("Id not found!");     //if index not found respond with NotFound
-        //    }
+        #endregion
+      
 
-        //    note.Id = id;
-        //    note.OwnerId = ownerId;
-        //    _notes[index] = note;
-
-        //    return Ok(_notes);
-        //}
-
-
-
-
-        ///// <summary>
-        ///// Delete one note
-        ///// </summary>
-        ///// <param name="id">(Guid) id of the note</param>
-        ///// <param name="ownerId">(Guid) id of the owner</param>
-        ///// <returns>Ok if the id is valid, otherwise NotFound </returns>
-
-        //[HttpDelete("{id},{ownerId}")]
-        //public IActionResult DeleteNoteByIdAndOwner(Guid id,Guid ownerId)
-        //{
-        //    int index = _notes.FindIndex(note => note.Id == id && note.OwnerId == ownerId);
-        //    if (index == -1)
-        //        return NotFound("The note was not found!");
-
-        //    _notes.RemoveAt(index);
-        //    return Ok("The note was deleted");
-        //}
-
-        ///// <summary>
-        ///// Delete all notes of a given owner
-        ///// </summary>
-        ///// <param name="ownerId">(Guid) id of the owner</param>
-        ///// <returns>Ok if at least one note found by ownerId, otherwise NotFound</returns>
-
-        //[HttpDelete("owner/{ownerId}")]
-        //public IActionResult DeleteNotesByOwner(Guid ownerId)
-        //{
-
-        //    int index = _notes.FindIndex(note => note.OwnerId == ownerId);
-        //    if (index == -1)
-        //        return NotFound("The note was not found!");
-        //    while (_notes.FindIndex(note => note.OwnerId == ownerId) != -1)
-        //    {
-        //        _notes.RemoveAt(index);
-        //    }
-
-        //    return Ok("The notes have been deleted");
-        //}
 
     }
 }

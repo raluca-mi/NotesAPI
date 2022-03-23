@@ -7,15 +7,15 @@ namespace NotesAPI.Services
 {
     public interface ICollectionService<T>
     {
-        Task<List<T>> GetAll();
+        Task<List<T>> GetAllAsync();
 
-        Task<T> Get(Guid id);
+        Task<T> GetAsync(Guid id);
 
-        Task<bool> Create(T model);
+        Task<bool> CreateAsync(T model);
 
-        Task< bool> Update(Guid id, T model);
+        Task< bool> UpdateAsync(Guid id, T model);
 
-        Task<bool> Delete(Guid id);
+        Task<bool> DeleteAsync(Guid id);
 
     }
 }

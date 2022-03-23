@@ -21,11 +21,11 @@ namespace NotesAPI.Controllers
         /// <summary>
         /// Get all owners
         /// </summary>
-        /// <returns>list of owners</returns>
+        /// <returns>List of owners</returns>
         [HttpGet]
-        public async Task<IActionResult> GetOwners()
+        public async Task<IActionResult> GetOwnersAsync()
         {
-            return Ok(await _ownerCollectionService.GetAll());
+            return Ok(await _ownerCollectionService.GetAllAsync());
         }
 
         /// <summary>
@@ -35,9 +35,9 @@ namespace NotesAPI.Controllers
         /// <returns>Searched owner</returns>
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetOwnerById(Guid id)
+        public async Task<IActionResult> GetOwnerByIdAsync(Guid id)
         {
-            var owner = await _ownerCollectionService.Get(id);
+            var owner = await _ownerCollectionService.GetAsync(id);
 
             if (owner == null)
                 return NotFound();
@@ -45,18 +45,18 @@ namespace NotesAPI.Controllers
         }
 
         /// <summary>
-        /// Creates new owner
+        /// Create new owner
         /// </summary>
         /// <param name="owner">(Owner) owner</param>
-        /// <returns>updated list of owners</returns>
+        /// <returns>Updated list of owners</returns>
        
         [HttpPost]
-        public async Task<IActionResult> CreateOwner([FromBody] Owner owner)
+        public async Task<IActionResult> CreateOwnerAsync([FromBody] Owner owner)
         {
             if (owner == null)
                 return BadRequest("Owner is null");
 
-            return Ok(await _ownerCollectionService.Create(owner));
+            return Ok(await _ownerCollectionService.CreateAsync(owner));
         }
 
         /// <summary>
@@ -67,14 +67,14 @@ namespace NotesAPI.Controllers
         /// <returns>List of updated notes if the id is valid, otherwise create new note</returns>
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateOwner(Guid id, [FromBody] Owner owner)
+        public async Task<IActionResult> UpdateOwnerAsync(Guid id, [FromBody] Owner owner)
         {
             if (owner == null)
             {
-                return BadRequest("Owner can't be null");
+                return BadRequest("Owner is null");
             }
 
-            if (await _ownerCollectionService.Update(id, owner) == true)
+            if (await _ownerCollectionService.UpdateAsync(id, owner) == true)
                 return Ok();
             return NotFound();
         }
@@ -87,12 +87,12 @@ namespace NotesAPI.Controllers
         /// <returns>Ok if the id is valid, otherwise NotFound </returns>
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteOwner(Guid id)
+        public async Task<IActionResult> DeleteOwnerAsync(Guid id)
         {
-            if (await _ownerCollectionService.Delete(id) == false)
-                return NotFound("The owner was not found!");
+            if (await _ownerCollectionService.DeleteAsync(id) == false)
+                return NotFound("Owner not found!");
             else
-                return Ok("The owner has been deleted!");
+                return Ok("Owner deleted!");
         }
     }
 }

@@ -92,7 +92,7 @@ namespace NotesAPI.Controllers
             if (await _ownerCollectionService.DeleteAsync(id) == false)
                 return NotFound("Owner not found!");
             else
-                return Ok("Owner deleted!");
+                return Ok();
         }
     }
 }

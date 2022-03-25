@@ -81,7 +81,7 @@ namespace NotesAPI.Controllers
             if (note == null)
                 return BadRequest("Note is null!");
             await _noteCollectionService.CreateAsync(note);
-            return Ok("Note was created!");
+            return Ok();
           
         }
         #endregion
@@ -148,7 +148,7 @@ namespace NotesAPI.Controllers
             if (await _noteCollectionService.DeleteAsync(id) == false)
                 return NotFound("Note not found!");
             else
-                return Ok("Note deleted!");
+                return Ok();
         }
 
         /// <summary>
@@ -164,7 +164,7 @@ namespace NotesAPI.Controllers
             if (await _noteCollectionService.DeleteNotesByOwnerAsync(ownerId) == false)
                 return NotFound("Note not found!");
 
-            return Ok("Notes deleted!");
+            return Ok();
         }
 
 
@@ -181,7 +181,7 @@ namespace NotesAPI.Controllers
            if(await _noteCollectionService.DeleteNoteByIdAndOwnerAsync(id,ownerId)==false)
                 return NotFound("Note not found!");
 
-            return Ok("Note deleted!");
+            return Ok();
         }
 
         #endregion

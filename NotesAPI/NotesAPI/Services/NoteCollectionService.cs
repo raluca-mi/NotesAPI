@@ -41,9 +41,14 @@ namespace NotesAPI.Services
         #region Create
         public async Task<bool> CreateAsync(Note note)
         {
+            if(note.Id == Guid.Empty)
+            {
+                note.Id = Guid.NewGuid();
+            }
             await _notes.InsertOneAsync(note);
             return true;
         }
+
         #endregion
 
         #region Delete
